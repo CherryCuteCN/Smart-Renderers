@@ -1,0 +1,50 @@
+{
+  "name": "@smart-renderers/core",
+  "version": "1.0.0",
+  "description": "Core runtime for Smart-Renderers.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build --config ../../vite.config.ts && tsc -p tsconfig.build.json",
+    "dev": "vite build --config ../../vite.config.ts --watch",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tests/tsconfig.json",
+    "test": "vitest run --config ../../vitest.config.ts",
+    "test:watch": "vitest --config ../../vitest.config.ts"
+  },
+  "keywords": [
+    "electron",
+    "renderer",
+    "manager",
+    "typescript"
+  ],
+  "author": "Cherry Fu <https://github.com/dongguacute>",
+  "homepage": "https://github.com/CherryCuteCN/Smart-Renderers",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CherryCuteCN/Smart-Renderers.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/CherryCuteCN/Smart-Renderers/issues"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^26.4.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2",
+    "vitest": "^5.0.0"
+  }
+}

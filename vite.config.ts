@@ -8,6 +8,7 @@ const nodeExternals = [
 ];
 
 export default defineConfig({
+  root: process.cwd(),
   resolve: {
     conditions: ["node", "module", "import", "default"],
   },
