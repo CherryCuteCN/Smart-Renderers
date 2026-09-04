@@ -41,6 +41,14 @@
   },
   "license": "MIT",
   "type": "module",
+  "peerDependencies": {
+    "electron": ">=20"
+  },
+  "peerDependenciesMeta": {
+    "electron": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@types/node": "^26.4.1",
     "typescript": "^7.0.2",
