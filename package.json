@@ -1,0 +1,66 @@
+{
+  "name": "smart-renderers",
+  "version": "1.0.0",
+  "description": "A plugin for optimizing Electron renderer management.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "dev": "vite build --watch",
+    "start": "tsx src/index.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tests/tsconfig.json && pnpm -r typecheck",
+    "prepare": "husky",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "electron",
+    "renderer",
+    "manager",
+    "typescript",
+    "electron-plugin"
+  ],
+  "author": "Cherry Fu <https://github.com/dongguacute>",
+  "homepage": "https://github.com/CherryCuteCN/Smart-Renderers",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CherryCuteCN/Smart-Renderers.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CherryCuteCN/Smart-Renderers/issues"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "MIT",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.22.0",
+      "onFail": "download"
+    }
+  },
+  "type": "module",
+  "devDependencies": {
+    "@smart-renderers/eslint-config": "workspace:*",
+    "@types/node": "^26.4.1",
+    "eslint": "^10.9.1",
+    "husky": "^9.1.7",
+    "jiti": "^2.7.0",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2",
+    "vitest": "^5.0.0"
+  }
+}
