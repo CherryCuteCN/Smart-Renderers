@@ -24,7 +24,7 @@ export default defineConfig({
     minify: false,
     target: "node20",
     rollupOptions: {
-      external: nodeExternals,
+      external: [...nodeExternals, /^@smart-renderers\//],
     },
   },
 });

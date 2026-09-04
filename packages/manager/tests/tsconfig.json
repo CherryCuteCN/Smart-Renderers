@@ -1,0 +1,14 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "../..",
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "types": ["node"],
+    "paths": {
+      "@smart-renderers/core": ["../../core/src/index.ts"]
+    }
+  },
+  "include": ["./**/*.ts", "../src/**/*.ts"]
+}
