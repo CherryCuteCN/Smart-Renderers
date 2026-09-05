@@ -38,7 +38,7 @@ jobs:
           else
             VERSION="${LATEST#v}-dev.${TIMESTAMP}"
           fi
-          npm version "$VERSION" --no-git-tag-version --allow-same-version
+          pnpm pkg set version="$VERSION"
           echo "Updated package.json to dev version $VERSION:"
           cat package.json
 

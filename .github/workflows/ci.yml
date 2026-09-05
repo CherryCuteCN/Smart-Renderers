@@ -36,7 +36,7 @@ jobs:
 
       - name: Update package.json version with release tag
         run: |
-          npm version "$RELEASE_TAG" --no-git-tag-version --allow-same-version
+          pnpm pkg set version="$RELEASE_TAG"
           echo "Updated package.json:"
           cat package.json
 
