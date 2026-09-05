@@ -1,8 +1,10 @@
 packages:
   - "packages/*"
+  - "examples/*"
 
 allowBuilds:
   esbuild: true
+  electron: true
 
 peerDependencyRules:
   allowedVersions:

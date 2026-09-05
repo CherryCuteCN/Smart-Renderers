@@ -1,0 +1,24 @@
+{
+  "name": "@smart-renderers/example-electron",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Electron playground that exercises smart-renderers on live BrowserWindows.",
+  "type": "module",
+  "main": "./dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/copy-static.mjs",
+    "start": "pnpm build && electron .",
+    "test:e2e": "pnpm build && node scripts/run-e2e.mjs"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "smart-renderers": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.1",
+    "electron": "^38.0.0",
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>smart-renderers electron example</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #101218;
+        --panel: #181b24;
+        --line: #2a3040;
+        --text: #e8edf7;
+        --muted: #8b93a7;
+        --go: #3dd68c;
+        --wait: #f0b429;
+        --stop: #f25c54;
+        --accent: #6ea8fe;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          14px/1.45 ui-sans-serif,
+          "Segoe UI",
+          sans-serif;
+      }
+
+      #app {
+        display: grid;
+        gap: 16px;
+        padding: 24px;
+        max-width: 980px;
+        margin: 0 auto;
+      }
+
+      h1,
+      h2 {
+        margin: 0 0 8px;
+        letter-spacing: -0.03em;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      h2 {
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+
+      p,
+      .fine,
+      .lede {
+        color: var(--muted);
+        margin: 0 0 12px;
+      }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        color: var(--accent);
+      }
+
+      .eyebrow {
+        margin: 0 0 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 11px;
+        color: var(--accent);
+      }
+
+      .hero,
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 18px;
+      }
+
+      .pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 16px 0 0;
+      }
+
+      .pills div {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 6px 10px;
+        display: flex;
+        gap: 8px;
+        margin: 0;
+      }
+
+      dt {
+        color: var(--muted);
+      }
+
+      dd {
+        margin: 0;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      button {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: #10141d;
+        color: var(--text);
+        border-radius: 10px;
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+
+      button:not(:disabled):hover {
+        border-color: var(--accent);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 3px 8px;
+        font-size: 12px;
+        border: 1px solid var(--line);
+      }
+
+      .badge.go {
+        color: var(--go);
+      }
+
+      .badge.wait {
+        color: var(--wait);
+      }
+
+      .badge.stop {
+        color: var(--stop);
+      }
+
+      .table {
+        display: grid;
+        gap: 6px;
+      }
+
+      .thead,
+      .trow {
+        display: grid;
+        grid-template-columns: 1.4fr 0.7fr 0.8fr 0.7fr 0.8fr auto;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .thead {
+        color: var(--muted);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .trow {
+        border-top: 1px solid var(--line);
+        padding-top: 8px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .log {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 6px;
+        max-height: 220px;
+        overflow: auto;
+      }
+
+      .log li {
+        display: grid;
+        grid-template-columns: 88px 180px 90px 1fr;
+        gap: 8px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+      }
+
+      time {
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <p class="lede">Waiting for main-process snapshot…</p>
+    </div>
+    <script type="module" src="./renderer.js"></script>
+  </body>
+</html>

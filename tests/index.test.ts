@@ -1,7 +1,12 @@
 import { expect, test } from "vitest";
 import * as smartRenderers from "../src/index";
 import { attachContents, createSmartRenderers } from "../src/index";
-import type { Clock, IdleSource, WebContentsLike } from "../src/index";
+import type {
+  BrowserWindowLike,
+  Clock,
+  IdleSource,
+  WebContentsLike,
+} from "../src/index";
 
 test("re-exports the core and manager contracts", () => {
   expect(smartRenderers.createRuntime).toBeTypeOf("function");
@@ -97,6 +102,157 @@ test("attachContents binds an electron-like webContents and can detach", () => {
   api.dispose();
 });
 
+test("a single idle window expires and is closed", () => {
+  const clock = createFakeClock();
+  const idle = createFakeIdleSource();
+  const events: Array<{ type: string; targetId?: string; action?: string }> = [];
+  const api = createSmartRenderers({
+    clock,
+    idle,
+    countdownMs: 1_000,
+    idleAfterMs: 0,
+    host: capableHost(),
+    policy: {
+      onExpired: "destroy",
+      untrackOnDestroy: true,
+    },
+  });
+  api.subscribe((event) => {
+    events.push({
+      type: event.type,
+      targetId: event.targetId,
+      action: "action" in event ? event.action : undefined,
+    });
+  });
+
+  const contents = fakeContents(3);
+  const window = fakeWindow();
+  attachContents(api, contents, window);
+
+  clock.flush();
+  expect(api.getSnapshot().targets[0]?.countdown.phase).toBe("running");
+  expect(window.destroyed).toBe(false);
+
+  idle.setIdleTimeSeconds(1);
+  idle.emitPower();
+
+  expect(window.destroyed).toBe(true);
+  expect(contents.closed).toBe(false);
+  expect(events).toContainEqual({
+    type: "countdown.expired",
+    targetId: "3",
+    action: undefined,
+  });
+  expect(events).toContainEqual({
+    type: "action.applied",
+    targetId: "3",
+    action: "destroy",
+  });
+  expect(api.getSnapshot().targets).toEqual([]);
+  api.dispose();
+});
+
+test("pages that share one renderer pid stay distinct targets", () => {
+  const clock = createFakeClock();
+  const idle = createFakeIdleSource();
+  const applied: string[] = [];
+  const api = createSmartRenderers({
+    clock,
+    idle,
+    countdownMs: 1_000,
+    idleAfterMs: 0,
+    host: capableHost(),
+    policy: {
+      onExpired: "destroy",
+      untrackOnDestroy: true,
+    },
+  });
+  api.subscribe((event) => {
+    if (event.type === "action.applied") {
+      applied.push(`${event.action}:${event.targetId}`);
+    }
+  });
+
+  const pageA = fakeContents(10);
+  const pageB = fakeContents(11);
+  const windowA = fakeWindow();
+  const windowB = fakeWindow();
+  attachContents(api, pageA, windowA);
+  attachContents(api, pageB, windowB);
+
+  const before = api.getSnapshot();
+  expect(before.targets.map((target) => target.id)).toEqual(["10", "11"]);
+  expect(before.targets[0]?.pid).toBe(process.pid);
+  expect(before.targets[1]?.pid).toBe(process.pid);
+  expect(before.targets[0]?.pid).toBe(before.targets[1]?.pid);
+
+  clock.flush();
+  api.reportActivity("11");
+  idle.setIdleTimeSeconds(1);
+  idle.emitPower();
+
+  expect(applied).toEqual(["destroy:10"]);
+  expect(windowA.destroyed).toBe(true);
+  expect(windowB.destroyed).toBe(false);
+  expect(api.getSnapshot().targets.map((target) => target.id)).toEqual(["11"]);
+  expect(api.getSnapshot().targets[0]?.countdown.phase).toBe("inactive");
+  api.dispose();
+});
+
+test("ending one shared-renderer page does not close the page still in use", () => {
+  const clock = createFakeClock();
+  const idle = createFakeIdleSource();
+  const applied: string[] = [];
+  const cancelled: string[] = [];
+  const api = createSmartRenderers({
+    clock,
+    idle,
+    countdownMs: 1_000,
+    idleAfterMs: 0,
+    host: capableHost(),
+    policy: {
+      onExpired: "destroy",
+      untrackOnDestroy: true,
+    },
+  });
+  api.subscribe((event) => {
+    if (event.type === "action.applied") {
+      applied.push(`${event.action}:${event.targetId}`);
+    }
+    if (event.type === "countdown.cancelled") {
+      cancelled.push(`${event.reason}:${event.targetId}`);
+    }
+  });
+
+  const pageA = fakeContents(10);
+  const pageB = fakeContents(11);
+  const windowA = fakeWindow();
+  const windowB = fakeWindow();
+  const detachA = attachContents(api, pageA, windowA);
+  attachContents(api, pageB, windowB);
+  clock.flush();
+
+  api.reportActivity("11");
+  detachA();
+  idle.setIdleTimeSeconds(1);
+  idle.emitPower();
+
+  expect(cancelled).toContain("untracked:10");
+  expect(cancelled).not.toContain("untracked:11");
+  expect(applied).toEqual([]);
+  expect(windowA.destroyed).toBe(false);
+  expect(windowB.destroyed).toBe(false);
+  expect(api.getSnapshot().targets.map((target) => target.id)).toEqual(["11"]);
+
+  clock.flush();
+  idle.emitPower();
+
+  expect(applied).toEqual(["destroy:11"]);
+  expect(windowB.destroyed).toBe(true);
+  expect(windowA.destroyed).toBe(false);
+  api.dispose();
+});
+
 function createFakeClock(start = 0): Clock & {
   advance: (ms: number) => void;
   flush: () => void;
@@ -172,6 +328,47 @@ function createFakeIdleSource(initialSeconds = 0): IdleSource & {
       for (const listener of [...listeners]) {
         listener();
       }
+    },
+  };
+}
+
+function capableHost() {
+  return {
+    getAvailability: () => ({
+      electron: true,
+      processType: "browser" as const,
+      rendererCapable: true,
+    }),
+  };
+}
+
+function fakeContents(id: number): WebContentsLike & {
+  id: number;
+  destroyed: boolean;
+  closed: boolean;
+} {
+  return {
+    id,
+    destroyed: false,
+    closed: false,
+    isDestroyed() {
+      return this.destroyed;
+    },
+    close() {
+      this.closed = true;
+      this.destroyed = true;
+    },
+  };
+}
+
+function fakeWindow(): BrowserWindowLike & { destroyed: boolean } {
+  return {
+    destroyed: false,
+    isDestroyed() {
+      return this.destroyed;
+    },
+    destroy() {
+      this.destroyed = true;
     },
   };
 }

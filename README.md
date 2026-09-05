@@ -230,6 +230,16 @@ const manager = createManager({
 
 Only `smart-renderers` is published to npm. The scoped packages are `private` workspace packages and are bundled into `dist`.
 
+## Example
+
+`examples/electron` is a live Electron app that attaches `smart-renderers` to real `BrowserWindow`s. It shortens the timers, injects a controllable idle source, and shows countdown events plus throttle / hibernate / destroy on screen.
+
+```bash
+pnpm example:electron
+```
+
+See [examples/electron/README.md](examples/electron/README.md).
+
 ## Scripts
 
 ```bash
@@ -238,6 +248,7 @@ pnpm typecheck
 pnpm lint
 pnpm build
 pnpm pack
+pnpm example:electron
 ```
 
 ## License

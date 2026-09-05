@@ -29,6 +29,7 @@ export function createEslintConfig(options: EslintConfigOptions) {
               "*.config.mjs",
               "eslint.config.ts",
               "scripts/*.mjs",
+              "examples/electron/scripts/*.mjs",
             ],
           },
           tsconfigRootDir: options.tsconfigRootDir,

@@ -25,7 +25,9 @@
     "prepare": "husky",
     "prepack": "pnpm build",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "example:electron": "pnpm build && pnpm --filter @smart-renderers/example-electron start",
+    "example:electron:e2e": "pnpm --filter @smart-renderers/example-electron test:e2e"
   },
   "keywords": [
     "electron",
