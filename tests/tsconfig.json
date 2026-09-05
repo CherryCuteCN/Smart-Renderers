@@ -3,7 +3,11 @@
   "compilerOptions": {
     "rootDir": "..",
     "noEmit": true,
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "@smart-renderers/core": ["../packages/core/src/index.ts"],
+      "@smart-renderers/manager": ["../packages/manager/src/index.ts"]
+    }
   },
   "include": ["./**/*.ts", "../src/**/*.ts"]
 }

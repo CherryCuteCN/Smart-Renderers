@@ -10,5 +10,7 @@ test("exports the manager contract", () => {
   expect(manager.createMemoryActionPort).toBeTypeOf("function");
   expect(manager.createElectronActionPort).toBeTypeOf("function");
   expect(manager.createContentsHandle).toBeTypeOf("function");
+  expect(manager.createHandleRegistry).toBeTypeOf("function");
+  expect(manager.isBindableActionPort).toBeTypeOf("function");
   expect(manager.DEFAULT_EXPIRED_ACTION).toBe("hibernate");
 });

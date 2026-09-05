@@ -206,6 +206,16 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@smart-renderers/core':
+        specifier: workspace:*
+        version: link:packages/core
+      '@smart-renderers/manager':
+        specifier: workspace:*
+        version: link:packages/manager
+      electron:
+        specifier: '>=20'
+        version: 44.1.1
     devDependencies:
       '@smart-renderers/eslint-config':
         specifier: workspace:*

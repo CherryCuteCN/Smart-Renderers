@@ -9,7 +9,12 @@ export type {
   WebContentsLike,
 } from "./electron-actions";
 export { createManager } from "./manager";
-export { createMemoryActionPort } from "./memory-actions";
+export {
+  createHandleRegistry,
+  createMemoryActionPort,
+  isBindableActionPort,
+} from "./memory-actions";
+export type { HandleRegistry } from "./memory-actions";
 export { DEFAULT_EXPIRED_ACTION } from "./types";
 export type {
   ActionPort,

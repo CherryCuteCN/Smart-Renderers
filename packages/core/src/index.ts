@@ -26,6 +26,7 @@ export type {
   RendererSnapshot,
   Runtime,
   RuntimeOptions,
+  SnapshotSchema,
   TargetCountdown,
   TargetKind,
   TrackedTarget,

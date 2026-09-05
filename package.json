@@ -11,16 +11,19 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE"
   ],
+  "sideEffects": false,
   "scripts": {
-    "build": "vite build && tsc -p tsconfig.build.json",
+    "build": "pnpm --filter @smart-renderers/core --filter @smart-renderers/manager build && vite build && tsc -p tsconfig.build.json",
     "dev": "vite build --watch",
     "start": "tsx src/index.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tests/tsconfig.json && pnpm -r typecheck",
     "prepare": "husky",
+    "prepack": "pnpm build",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -52,6 +55,18 @@
     }
   },
   "type": "module",
+  "peerDependencies": {
+    "electron": ">=20"
+  },
+  "peerDependenciesMeta": {
+    "electron": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@smart-renderers/core": "workspace:*",
+    "@smart-renderers/manager": "workspace:*"
+  },
   "devDependencies": {
     "@smart-renderers/eslint-config": "workspace:*",
     "@types/node": "^26.4.1",

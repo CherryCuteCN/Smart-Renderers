@@ -284,6 +284,45 @@ test("re-track updates pid and counts as activity", () => {
   });
 });
 
+test("activity after expire cancels the expired countdown", () => {
+  const clock = createFakeClock();
+  const idle = createFakeIdleSource();
+  const runtime = createRuntime({ clock, idle, countdownMs: 1_000 });
+  const events = collectEvents(runtime);
+
+  runtime.track({ id: "win-1", pid: 11 });
+  clock.flush();
+  idle.setIdleTimeSeconds(1);
+  idle.emitPower();
+  runtime.reportActivity("win-1");
+
+  expect(events.map((event) => event.type)).toEqual([
+    "countdown.started",
+    "countdown.expired",
+    "countdown.cancelled",
+  ]);
+  expect(events.at(-1)).toMatchObject({ reason: "activity" });
+  expect(countdownOf(runtime.getSnapshot(), "win-1").phase).toBe("inactive");
+});
+
+test("untrack after expire still emits cancelled", () => {
+  const clock = createFakeClock();
+  const idle = createFakeIdleSource();
+  const runtime = createRuntime({ clock, idle, countdownMs: 1_000 });
+  const events = collectEvents(runtime);
+
+  runtime.track({ id: "win-1", pid: 11 });
+  clock.flush();
+  idle.setIdleTimeSeconds(1);
+  idle.emitPower();
+  runtime.untrack("win-1");
+
+  expect(events.at(-1)).toMatchObject({
+    type: "countdown.cancelled",
+    reason: "untracked",
+  });
+});
+
 test("dispose stops timers and rejects later use", () => {
   const clock = createFakeClock();
   const idle = createFakeIdleSource();

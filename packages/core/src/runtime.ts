@@ -8,6 +8,7 @@ import type {
   Availability,
   Clock,
   CoreEvent,
+  CountdownCancelReason,
   IdleSource,
   ProcessType,
   RendererSnapshot,
@@ -147,6 +148,22 @@ export function createRuntime(options: RuntimeOptions = {}): Runtime {
     });
   }
 
+  function resumeFromIdle(
+    target: InternalTarget,
+    reason: CountdownCancelReason,
+  ): void {
+    const wasIdle = target.phase !== "active";
+    becomeActive(target);
+    if (wasIdle) {
+      emit({
+        type: "countdown.cancelled",
+        targetId: target.id,
+        reason,
+        snapshot: snapshot(),
+      });
+    }
+  }
+
   function startCountdown(target: InternalTarget): void {
     if (disposed || target.phase !== "active" || !targets.has(target.id)) {
       return;
@@ -201,18 +218,9 @@ export function createRuntime(options: RuntimeOptions = {}): Runtime {
       assertOpen();
       const existing = targets.get(input.id);
       if (existing) {
-        const wasCounting = existing.phase === "countdown";
         existing.pid = input.pid;
         existing.kind = input.kind ?? existing.kind;
-        becomeActive(existing);
-        if (wasCounting) {
-          emit({
-            type: "countdown.cancelled",
-            targetId: existing.id,
-            reason: "activity",
-            snapshot: snapshot(),
-          });
-        }
+        resumeFromIdle(existing, "activity");
         return;
       }
       const target: InternalTarget = {
@@ -231,10 +239,10 @@ export function createRuntime(options: RuntimeOptions = {}): Runtime {
       if (!target) {
         return;
       }
-      const wasCounting = target.phase === "countdown";
+      const wasIdle = target.phase !== "active";
       clearTimer(target);
       targets.delete(id);
-      if (wasCounting) {
+      if (wasIdle) {
         emit({
           type: "countdown.cancelled",
           targetId: id,
@@ -249,16 +257,7 @@ export function createRuntime(options: RuntimeOptions = {}): Runtime {
       if (!target) {
         return;
       }
-      const wasCounting = target.phase === "countdown";
-      becomeActive(target);
-      if (wasCounting) {
-        emit({
-          type: "countdown.cancelled",
-          targetId: id,
-          reason: "activity",
-          snapshot: snapshot(),
-        });
-      }
+      resumeFromIdle(target, "activity");
     },
     getSnapshot() {
       assertOpen();

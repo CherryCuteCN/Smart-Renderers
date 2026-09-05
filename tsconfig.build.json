@@ -4,6 +4,8 @@
     "noEmit": false,
     "emitDeclarationOnly": true,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "rootDir": "src",
+    "paths": {}
   }
 }
