@@ -1,7 +1,7 @@
 {
   "name": "@smart-renderers/manager",
   "version": "1.0.0",
-  "description": "Action layer for Smart-Renderers. Consumes snapshots and events from core.",
+  "description": "Executes renderer actions from Smart-Renderers snapshots and events.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -18,7 +18,8 @@
     "dev": "vite build --config ../../vite.config.ts --watch",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tests/tsconfig.json",
     "test": "vitest run --config ../../vitest.config.ts",
-    "test:watch": "vitest --config ../../vitest.config.ts"
+    "test:watch": "vitest --config ../../vitest.config.ts",
+    "stress": "tsx tests/stress-pipeline.ts"
   },
   "keywords": [
     "electron",
@@ -41,6 +42,14 @@
   },
   "license": "MIT",
   "type": "module",
+  "peerDependencies": {
+    "electron": ">=20"
+  },
+  "peerDependenciesMeta": {
+    "electron": {
+      "optional": true
+    }
+  },
   "dependencies": {
     "@smart-renderers/core": "workspace:*"
   },

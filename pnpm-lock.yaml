@@ -281,6 +281,9 @@ importers:
       '@smart-renderers/core':
         specifier: workspace:*
         version: link:../core
+      electron:
+        specifier: '>=20'
+        version: 44.1.1
     devDependencies:
       '@types/node':
         specifier: ^26.4.1
