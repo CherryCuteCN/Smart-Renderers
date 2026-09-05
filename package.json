@@ -50,11 +50,12 @@
   "publishConfig": {
     "access": "public"
   },
+  "packageManager": "pnpm@11.22.0",
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "^11.22.0",
-      "onFail": "download"
+      "version": "11.22.0",
+      "onFail": "error"
     }
   },
   "type": "module",
