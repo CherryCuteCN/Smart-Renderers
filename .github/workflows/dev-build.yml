@@ -23,15 +23,23 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           registry-url: "https://registry.npmjs.org/"
           cache: pnpm
 
       - name: Update package.json version with timestamp for dev build
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TIMESTAMP=$(date +%s)
-          npm version "0.0.0-dev.$TIMESTAMP" --no-git-tag-version --allow-same-version
-          echo "Updated package.json to dev version:"
+          LATEST=$(gh api "repos/${GITHUB_REPOSITORY}/releases/latest" --jq .tag_name 2>/dev/null || true)
+          if [ -z "$LATEST" ] || [ "$LATEST" = "null" ]; then
+            VERSION="0.0.0-dev.${TIMESTAMP}"
+          else
+            VERSION="${LATEST#v}-dev.${TIMESTAMP}"
+          fi
+          npm version "$VERSION" --no-git-tag-version --allow-same-version
+          echo "Updated package.json to dev version $VERSION:"
           cat package.json
 
       - name: Install dependencies
