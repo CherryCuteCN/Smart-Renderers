@@ -62,6 +62,20 @@ jobs:
       - name: Build main package
         run: pnpm run build
 
+      - name: Configure npm auth
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "NPM_TOKEN secret is empty." >&2
+            echo "Create a Granular Access Token with Read and write, Bypass 2FA, and Allow publishing new packages." >&2
+            exit 1
+          fi
+          pnpm config set "//registry.npmjs.org/:_authToken" "$NODE_AUTH_TOKEN"
+
+      - name: Verify npm auth
+        run: pnpm whoami
+
       - name: Publish to npm with dev tag
         run: pnpm publish . --no-git-checks --access public --tag dev
         env:
