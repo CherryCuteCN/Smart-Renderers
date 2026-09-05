@@ -61,26 +61,14 @@ jobs:
       - name: Build main package
         run: pnpm run build
 
-      - name: Configure npm auth
+      - name: Publish to npm with dev tag
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          TOKEN="${NODE_AUTH_TOKEN#"${NODE_AUTH_TOKEN%%[![:space:]]*}"}"
-          TOKEN="${TOKEN%"${TOKEN##*[![:space:]]}"}"
-          if [ -z "$TOKEN" ]; then
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
             echo "NPM_TOKEN secret is empty." >&2
-            echo "Create a Granular Access Token with Read and write, Bypass 2FA, All packages, and Allow publishing new packages." >&2
             exit 1
           fi
-          echo "token_length=${#TOKEN}"
-          echo "token_prefix=${TOKEN:0:4}"
           umask 077
-          printf '//registry.npmjs.org/:_authToken=%s\nregistry=https://registry.npmjs.org/\n' "$TOKEN" > .npmrc
-          npm whoami
-
-      - name: Publish to npm with dev tag
-        run: |
-          pnpm pkg delete devEngines
-          npm publish --ignore-scripts --access public --tag dev
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          printf '//registry.npmjs.org/:_authToken=%s\n' "$NODE_AUTH_TOKEN" > .npmrc
+          pnpm publish . --no-git-checks --access public --tag dev
