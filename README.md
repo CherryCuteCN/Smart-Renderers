@@ -2,8 +2,8 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-[![npm latest](https://img.shields.io/npm/v/smart-renderers/latest?label=latest)](https://www.npmjs.com/package/smart-renderers)
-[![npm dev](https://img.shields.io/npm/v/smart-renderers/dev?label=dev)](https://www.npmjs.com/package/smart-renderers?activeTab=versions)
+[![npm](https://img.shields.io/npm/v/smart-renderers?label=latest)](https://www.npmjs.com/package/smart-renderers)
+[![npm-dev](https://img.shields.io/npm/v/smart-renderers/dev?label=dev)](https://www.npmjs.com/package/smart-renderers?activeTab=versions)
 
 A TypeScript plugin for Electron main-process renderer management. It watches tracked windows / webviews / offscreen renderers, starts a countdown after they go idle, and then throttles, hibernates, or destroys them. Activity restores reversible actions.
 

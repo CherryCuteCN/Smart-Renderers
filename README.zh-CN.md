@@ -2,8 +2,8 @@
 
 [English](./README.md) | 简体中文
 
-[![npm latest](https://img.shields.io/npm/v/smart-renderers/latest?label=latest)](https://www.npmjs.com/package/smart-renderers)
-[![npm dev](https://img.shields.io/npm/v/smart-renderers/dev?label=dev)](https://www.npmjs.com/package/smart-renderers?activeTab=versions)
+[![npm](https://img.shields.io/npm/v/smart-renderers?label=latest)](https://www.npmjs.com/package/smart-renderers)
+[![npm-dev](https://img.shields.io/npm/v/smart-renderers/dev?label=dev)](https://www.npmjs.com/package/smart-renderers?activeTab=versions)
 
 面向 Electron 主进程的 TypeScript 渲染进程管理插件。它会监视已跟踪的窗口 / webview / 离屏渲染进程，在空闲后启动倒计时，然后节流、休眠或销毁它们。有活动时会恢复可逆操作。
 
