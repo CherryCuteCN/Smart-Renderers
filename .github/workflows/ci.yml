@@ -6,7 +6,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   build:
@@ -54,18 +53,22 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          if [ -z "$NODE_AUTH_TOKEN" ]; then
+          TOKEN="${NODE_AUTH_TOKEN#"${NODE_AUTH_TOKEN%%[![:space:]]*}"}"
+          TOKEN="${TOKEN%"${TOKEN##*[![:space:]]}"}"
+          if [ -z "$TOKEN" ]; then
             echo "NPM_TOKEN secret is empty." >&2
-            echo "Create a Granular Access Token with Read and write, Bypass 2FA, and Allow publishing new packages." >&2
+            echo "Create a Granular Access Token with Read and write, Bypass 2FA, All packages, and Allow publishing new packages." >&2
             exit 1
           fi
-          pnpm config set "//registry.npmjs.org/:_authToken" "$NODE_AUTH_TOKEN"
-
-      - name: Verify npm auth
-        run: pnpm whoami
+          echo "token_length=${#TOKEN}"
+          echo "token_prefix=${TOKEN:0:4}"
+          umask 077
+          printf '//registry.npmjs.org/:_authToken=%s\nregistry=https://registry.npmjs.org/\n' "$TOKEN" > .npmrc
+          npm whoami
 
       - name: Publish to npm
-        run: pnpm publish . --no-git-checks --access public
+        run: |
+          pnpm pkg delete devEngines
+          npm publish --ignore-scripts --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
