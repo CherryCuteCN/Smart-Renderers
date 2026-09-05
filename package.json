@@ -16,7 +16,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "pnpm --filter @smart-renderers/core --filter @smart-renderers/manager build && vite build && tsc -p tsconfig.build.json",
+    "build": "pnpm --filter @smart-renderers/core --filter @smart-renderers/manager build && vite build && tsc -p tsconfig.build.json && node scripts/bundle-dts.mjs",
     "dev": "vite build --watch",
     "start": "tsx src/index.ts",
     "lint": "eslint .",
@@ -47,6 +47,9 @@
     "node": ">=20.0.0"
   },
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
@@ -63,12 +66,10 @@
       "optional": true
     }
   },
-  "dependencies": {
-    "@smart-renderers/core": "workspace:*",
-    "@smart-renderers/manager": "workspace:*"
-  },
   "devDependencies": {
+    "@smart-renderers/core": "workspace:*",
     "@smart-renderers/eslint-config": "workspace:*",
+    "@smart-renderers/manager": "workspace:*",
     "@types/node": "^26.4.1",
     "eslint": "^10.9.1",
     "husky": "^9.1.7",

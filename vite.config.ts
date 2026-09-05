@@ -1,5 +1,10 @@
 import { builtinModules } from "node:module";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
+
+const repoRoot = path.dirname(fileURLToPath(import.meta.url));
+const isRootBuild = path.resolve(process.cwd()) === path.resolve(repoRoot);
 
 const nodeExternals = [
   ...builtinModules,
@@ -24,7 +29,9 @@ export default defineConfig({
     minify: false,
     target: "node20",
     rollupOptions: {
-      external: [...nodeExternals, /^@smart-renderers\//],
+      external: isRootBuild
+        ? nodeExternals
+        : [...nodeExternals, /^@smart-renderers\//],
     },
   },
 });

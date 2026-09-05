@@ -28,11 +28,16 @@ export function createEslintConfig(options: EslintConfigOptions) {
               "*.config.js",
               "*.config.mjs",
               "eslint.config.ts",
+              "scripts/*.mjs",
             ],
           },
           tsconfigRootDir: options.tsconfigRootDir,
         },
       },
+    },
+    {
+      files: ["**/*.mjs"],
+      ...tseslint.configs.disableTypeChecked,
     },
   );
 }

@@ -17,7 +17,7 @@ pnpm add smart-renderers
 # or: npm install smart-renderers
 ```
 
-This package re-exports `@smart-renderers/core` (idle + countdown) and `@smart-renderers/manager` (actions). You can also import those packages directly.
+This package re-exports the private workspace packages `@smart-renderers/core` (idle + countdown) and `@smart-renderers/manager` (actions). They are bundled into the published tarball and are not installed separately.
 
 ## How it works
 
@@ -228,7 +228,7 @@ const manager = createManager({
 | `@smart-renderers/core` | Idle detection, countdown, snapshots. |
 | `@smart-renderers/manager` | Action ports, policy, operators. |
 
-Publish all three together; the root package depends on the scoped packages at runtime.
+Only `smart-renderers` is published to npm. The scoped packages are `private` workspace packages and are bundled into `dist`.
 
 ## Scripts
 

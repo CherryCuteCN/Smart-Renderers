@@ -1,6 +1,7 @@
 {
   "name": "@smart-renderers/manager",
   "version": "1.0.0",
+  "private": true,
   "description": "Executes renderer actions from Smart-Renderers snapshots and events.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

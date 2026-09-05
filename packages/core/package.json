@@ -1,6 +1,7 @@
 {
   "name": "@smart-renderers/core",
   "version": "1.0.0",
+  "private": true,
   "description": "Core runtime for Smart-Renderers.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

@@ -207,19 +207,19 @@ importers:
 
   .:
     dependencies:
-      '@smart-renderers/core':
-        specifier: workspace:*
-        version: link:packages/core
-      '@smart-renderers/manager':
-        specifier: workspace:*
-        version: link:packages/manager
       electron:
         specifier: '>=20'
         version: 44.1.1
     devDependencies:
+      '@smart-renderers/core':
+        specifier: workspace:*
+        version: link:packages/core
       '@smart-renderers/eslint-config':
         specifier: workspace:*
         version: link:packages/eslint-config
+      '@smart-renderers/manager':
+        specifier: workspace:*
+        version: link:packages/manager
       '@types/node':
         specifier: ^26.4.1
         version: 26.4.1
