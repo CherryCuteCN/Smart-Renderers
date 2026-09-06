@@ -238,6 +238,9 @@ function lookupContents(
 }
 
 function loadElectronHost(): ElectronActionHost | undefined {
+  if (typeof (process.versions as { electron?: unknown }).electron !== "string") {
+    return undefined;
+  }
   try {
     return nodeRequire("electron") as ElectronActionHost;
   } catch {

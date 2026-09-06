@@ -51,6 +51,9 @@ export function tryCreateElectronIdleSource(): IdleSource | undefined {
 }
 
 function loadPowerMonitor(): PowerMonitorLike | undefined {
+  if (typeof (process.versions as { electron?: unknown }).electron !== "string") {
+    return undefined;
+  }
   try {
     const electron = nodeRequire("electron") as {
       powerMonitor?: PowerMonitorLike;
