@@ -1,0 +1,53 @@
+name: Test macOS
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: test-macos-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Build and test
+    runs-on: macos-latest
+    timeout-minutes: 20
+    env:
+      HUSKY: "0"
+      ELECTRON_DISABLE_SANDBOX: "1"
+      ELECTRON_ENABLE_LOGGING: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Electron e2e
+        run: pnpm example:electron:e2e

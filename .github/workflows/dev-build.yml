@@ -1,15 +1,62 @@
 name: Dev Build
 
 on:
-  push:
+  workflow_run:
+    workflows:
+      - Test Linux
+      - Test Windows
+      - Test macOS
+    types:
+      - completed
     branches:
       - main
 
+concurrency:
+  group: dev-build-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
+  actions: read
 
 jobs:
+  wait-for-platform-tests:
+    name: Wait for platform tests
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    outputs:
+      ready: ${{ steps.gate.outputs.ready }}
+    steps:
+      - name: Confirm Linux, Windows, and macOS tests succeeded
+        id: gate
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          ready=true
+          for name in "Test Linux" "Test Windows" "Test macOS"; do
+            json=$(gh run list \
+              --repo "$GITHUB_REPOSITORY" \
+              --workflow "$name" \
+              --commit "$SHA" \
+              --limit 5 \
+              --json conclusion,status,createdAt)
+            conclusion=$(echo "$json" | jq -r 'sort_by(.createdAt) | last | .conclusion // empty')
+            status=$(echo "$json" | jq -r 'sort_by(.createdAt) | last | .status // empty')
+            echo "$name: status=$status conclusion=$conclusion"
+            if [[ "$conclusion" != "success" ]]; then
+              ready=false
+            fi
+          done
+          echo "ready=$ready" >> "$GITHUB_OUTPUT"
+          if [[ "$ready" != "true" ]]; then
+            echo "Not all platform tests have succeeded for $SHA yet."
+          fi
+
   build:
+    needs: wait-for-platform-tests
+    if: needs.wait-for-platform-tests.outputs.ready == 'true'
     runs-on: ubuntu-latest
     env:
       HUSKY: "0"
@@ -17,6 +64,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4

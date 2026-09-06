@@ -1,5 +1,10 @@
 import { app, BrowserWindow } from "electron";
-import { attachContents, createSmartRenderers } from "smart-renderers";
+import {
+  attachContents,
+  createSmartRenderers,
+  detectAvailability,
+  tryCreateElectronIdleSource,
+} from "smart-renderers";
 import { createControllableIdleSource } from "./demo-idle.js";
 
 const COUNTDOWN_MS = 1_000;
@@ -31,18 +36,54 @@ async function waitUntil(
   throw new Error(`timed out waiting for ${label}`);
 }
 
-function createWindow(title: string): BrowserWindow {
+function createWindow(title: string, show = false): BrowserWindow {
   return new BrowserWindow({
-    width: 640,
-    height: 480,
+    width: 320,
+    height: 240,
     title,
-    show: false,
+    show,
+    skipTaskbar: true,
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
     },
   });
+}
+
+function closeWindow(window: BrowserWindow): void {
+  if (!window.isDestroyed()) {
+    window.destroy();
+  }
+}
+
+function scenarioElectronRuntime(): Check[] {
+  const availability = detectAvailability();
+  const idle = tryCreateElectronIdleSource();
+  const idleState = idle?.getIdleState(1);
+  return [
+    {
+      name: "detectAvailability reports electron main process",
+      ok:
+        availability.electron &&
+        availability.processType === "browser" &&
+        availability.rendererCapable,
+      detail: JSON.stringify(availability),
+    },
+    {
+      name: "powerMonitor idle source is available",
+      ok: idle !== undefined,
+    },
+    {
+      name: "powerMonitor returns a valid idle state",
+      ok:
+        idleState === "active" ||
+        idleState === "idle" ||
+        idleState === "locked" ||
+        idleState === "unknown",
+      detail: `state=${idleState ?? "(missing)"}`,
+    },
+  ];
 }
 
 function recordEvents(
@@ -98,6 +139,102 @@ async function scenarioIdleWindowIsClosed(): Promise<Check[]> {
     },
   ];
   renderers.dispose();
+  return checks;
+}
+
+async function scenarioThrottleKeepsWindowVisible(): Promise<Check[]> {
+  const idle = createControllableIdleSource();
+  const renderers = createSmartRenderers({
+    countdownMs: COUNTDOWN_MS,
+    idleAfterMs: 0,
+    idle: idle.source,
+    policy: { onExpired: "throttle", revertOnActivity: true },
+  });
+  const events = recordEvents(renderers);
+  const window = createWindow("e2e · throttle", true);
+  const id = String(window.webContents.id);
+  attachContents(renderers, window.webContents, window);
+  await window.loadURL("about:blank");
+  await waitUntil("throttle window visible", () => window.isVisible());
+  await waitUntil("countdown.started", () =>
+    events.includes(`countdown.started:${id}`),
+  );
+
+  idle.setIdleTimeSeconds(1);
+  await waitUntil("throttle applied", () =>
+    events.includes(`action.applied:throttle:${id}`),
+  );
+
+  const checks: Check[] = [
+    {
+      name: "throttle expires without hiding the window",
+      ok:
+        !window.isDestroyed() &&
+        window.isVisible() &&
+        window.webContents.backgroundThrottling === true &&
+        events.includes(`countdown.expired:${id}`),
+      detail: `visible=${window.isVisible()} throttling=${window.webContents.backgroundThrottling}`,
+    },
+  ];
+  renderers.dispose();
+  closeWindow(window);
+  return checks;
+}
+
+async function scenarioHibernateAndRestore(): Promise<Check[]> {
+  const idle = createControllableIdleSource();
+  const renderers = createSmartRenderers({
+    countdownMs: COUNTDOWN_MS,
+    idleAfterMs: 0,
+    idle: idle.source,
+    policy: { onExpired: "hibernate", revertOnActivity: true },
+  });
+  const events = recordEvents(renderers);
+  const window = createWindow("e2e · hibernate", true);
+  const id = String(window.webContents.id);
+  attachContents(renderers, window.webContents, window);
+  await window.loadURL("about:blank");
+  await waitUntil("hibernate window visible", () => window.isVisible());
+  await waitUntil("countdown.started", () =>
+    events.includes(`countdown.started:${id}`),
+  );
+
+  idle.setIdleTimeSeconds(1);
+  await waitUntil("hibernate applied", () =>
+    events.includes(`action.applied:hibernate:${id}`),
+  );
+
+  const afterHibernate = {
+    muted: window.webContents.isAudioMuted(),
+    hidden: !window.isVisible(),
+    throttled: window.webContents.backgroundThrottling === true,
+  };
+
+  renderers.reportActivity(id);
+  await waitUntil("hibernate reverted", () =>
+    events.includes(`action.reverted:${id}`),
+  );
+
+  const afterRestore = {
+    unmuted: !window.webContents.isAudioMuted(),
+    shown: window.isVisible(),
+    cancelled: events.includes(`countdown.cancelled:activity:${id}`),
+  };
+
+  const checks: Check[] = [
+    {
+      name: "hibernate mutes, hides, and throttles a visible window",
+      ok: afterHibernate.muted && afterHibernate.hidden && afterHibernate.throttled,
+      detail: JSON.stringify(afterHibernate),
+    },
+    {
+      name: "activity restores mute and visibility",
+      ok: afterRestore.unmuted && afterRestore.shown && afterRestore.cancelled,
+      detail: JSON.stringify(afterRestore),
+    },
+  ];
+  renderers.dispose();
+  closeWindow(window);
   return checks;
 }
 
@@ -213,10 +350,21 @@ app.on("window-all-closed", () => {
 void app.whenReady().then(async () => {
   let passed = true;
   try {
+    passed = printChecks("electron runtime", scenarioElectronRuntime()) && passed;
     passed =
       printChecks(
         "idle page is closed",
         await scenarioIdleWindowIsClosed(),
+      ) && passed;
+    passed =
+      printChecks(
+        "throttle keeps the window visible",
+        await scenarioThrottleKeepsWindowVisible(),
+      ) && passed;
+    passed =
+      printChecks(
+        "hibernate and restore a live window",
+        await scenarioHibernateAndRestore(),
       ) && passed;
     passed =
       printChecks(

@@ -53,10 +53,13 @@ Automated checks against **real** `BrowserWindow`s (fake idle seconds, `countdow
 pnpm example:electron:e2e
 ```
 
-That runs two live scenarios in the example process:
+That runs live scenarios in the example process:
 
-1. An idle window expires and is destroyed.
-2. Two pages share `process.pid` and stay distinct by `webContents.id`. Ending page A does not close page B while B is still in use; B is only destroyed later, when B itself goes idle.
+1. `detectAvailability()` and `powerMonitor` are present in a real Electron main process.
+2. An idle window expires and is destroyed.
+3. `throttle` keeps a visible window open and turns on background throttling.
+4. `hibernate` mutes and hides a visible window; `reportActivity()` restores both.
+5. Two pages share `process.pid` and stay distinct by `webContents.id`. Ending page A does not close page B while B is still in use; B is only destroyed later, when B itself goes idle.
 
 Requires Node.js 20+ and a machine that can run Electron.
 
