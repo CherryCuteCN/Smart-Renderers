@@ -1,0 +1,41 @@
+name: Question
+description: Ask about usage, API, or documentation.
+title: "[question] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for usage questions. For bugs or API changes, open a Bug report or Feature request instead.
+
+        Helpful docs:
+        - [How it works](https://github.com/CherryCuteCN/Smart-Renderers/blob/main/docs/how-it-works.md)
+        - [API](https://github.com/CherryCuteCN/Smart-Renderers/blob/main/docs/api.md)
+        - [Electron actions](https://github.com/CherryCuteCN/Smart-Renderers/blob/main/docs/electron.md)
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What are you trying to do, and what is unclear?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Versions, a short snippet, or the docs page you already read.
+      placeholder: |
+        smart-renderers 1.0.0, Electron 39, Node 22
+        I read docs/electron.md but I am unsure how revertOnActivity interacts with destroy.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I checked the docs and existing issues before asking.
+          required: true

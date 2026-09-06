@@ -1,0 +1,132 @@
+name: Bug report
+description: Something is not working as expected.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please fill in as much as you can so we can reproduce it.
+
+        Before filing, check [existing issues](https://github.com/CherryCuteCN/Smart-Renderers/issues) and the [docs](https://github.com/CherryCuteCN/Smart-Renderers/blob/main/docs/README.md).
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A short summary of the problem.
+      placeholder: After idle expires, the window never hibernates…
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      description: What should have happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps, or a small snippet using `createSmartRenderers` / `attachContents`.
+      placeholder: |
+        1. Call createSmartRenderers with policy.onExpired = "hibernate"
+        2. Attach a BrowserWindow via attachContents
+        3. Wait for idle + countdown
+        4. Observe…
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant configuration
+      description: Options you passed to `createSmartRenderers` (timers, policy, custom handles).
+      placeholder: |
+        createSmartRenderers({
+          countdownMs: 15 * 60 * 1000,
+          idleAfterMs: 0,
+          policy: {
+            onExpired: "hibernate",
+            revertOnActivity: true,
+            untrackOnDestroy: true,
+          },
+        })
+      render: ts
+    validations:
+      required: false
+
+  - type: input
+    id: package-version
+    attributes:
+      label: smart-renderers version
+      description: npm version or git SHA. Use `latest` / `dev` if you installed a dist-tag.
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: electron-version
+    attributes:
+      label: Electron version
+      description: Leave blank if you are not running inside Electron.
+      placeholder: "39.0.0"
+    validations:
+      required: false
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      placeholder: "22.x"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Windows
+        - Linux
+        - Multiple / other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Core (idle / countdown / snapshots)
+        - Manager (policy / actions / revert)
+        - Electron integration (`attachContents`, default handles)
+        - Docs / examples
+        - Build / publish / CI
+        - Unsure
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs, events, or snapshots
+      description: Paste relevant `smart-renderers` events, errors, or `getSnapshot()` output. Strip secrets.
+      render: text
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and did not find a duplicate.
+          required: true
+        - label: I can reproduce this with the latest `smart-renderers` release (or I explained why not).
+          required: true

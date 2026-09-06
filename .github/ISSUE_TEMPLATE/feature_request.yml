@@ -1,0 +1,68 @@
+name: Feature request
+description: Suggest an enhancement or new capability.
+title: "[feat] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tell us what you want to add or change. Please check [existing issues](https://github.com/CherryCuteCN/Smart-Renderers/issues) and the [API docs](https://github.com/CherryCuteCN/Smart-Renderers/blob/main/docs/api.md) first.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What limitation or friction are you hitting today?
+      placeholder: I need a custom expire action that the current policy cannot express…
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What should smart-renderers do instead? Include API sketches if you have them.
+      placeholder: |
+        Add a policy hook, e.g. onExpired: (target) => { … }
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds, custom TargetHandles, or other APIs you tried.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Core (idle / countdown / snapshots)
+        - Manager (policy / actions / revert)
+        - Electron integration (`attachContents`, default handles)
+        - Docs / examples
+        - Build / publish / CI
+        - Unsure
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Links, mock APIs, or related issues.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and did not find a duplicate.
+          required: true
+        - label: This is a concrete change, not a support question.
+          required: true

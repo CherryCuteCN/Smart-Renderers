@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://github.com/CherryCuteCN/Smart-Renderers/blob/main/docs/README.md
+    about: API, idle/countdown lifecycle, and Electron actions.
+  - name: Electron example
+    url: https://github.com/CherryCuteCN/Smart-Renderers/blob/main/examples/electron/README.md
+    about: Live playground that attaches smart-renderers to real BrowserWindows.
