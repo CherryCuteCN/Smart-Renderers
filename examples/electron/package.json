@@ -6,7 +6,7 @@
   "type": "module",
   "main": "./dist/main.js",
   "scripts": {
-    "build": "tsc -p tsconfig.json && node scripts/copy-static.mjs",
+    "build": "tsc -p tsconfig.build.json && node scripts/copy-static.mjs",
     "start": "pnpm build && electron .",
     "test:e2e": "pnpm build && node scripts/run-e2e.mjs"
   },

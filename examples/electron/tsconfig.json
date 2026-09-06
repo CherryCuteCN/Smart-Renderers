@@ -2,12 +2,15 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ES2022", "DOM"],
-    "rootDir": "src",
-    "outDir": "dist",
-    "noEmit": false,
+    "noEmit": true,
     "declaration": false,
     "declarationMap": false,
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "smart-renderers": ["../../src/index.ts"],
+      "@smart-renderers/core": ["../../packages/core/src/index.ts"],
+      "@smart-renderers/manager": ["../../packages/manager/src/index.ts"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
